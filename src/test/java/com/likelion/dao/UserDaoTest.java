@@ -1,5 +1,6 @@
 package com.likelion.dao;
 
+import com.likelion.vo.UserFactory;
 import com.likelion.vo.UserVo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,25 +24,24 @@ class UserDaoTest {
     @Autowired
     ApplicationContext context;
     UserDao userDao;
-
     UserVo user1;
     UserVo user2;
     UserVo user3;
 
     @BeforeEach
     void setUp() {
-         userDao = context.getBean("localUserDao", UserDao.class);
-         user1 = new UserVo(1, "seoyun", "1234");
-         user2 = new UserVo(2, "seoseo", "1234");
-         user3 = new UserVo(3, "yunyun", "1234");
+        userDao = context.getBean("localUserDao", UserDao.class);
+        user1 = UserFactory.createUser(1, "seoyun", "1234");
+        user2 = UserFactory.createUser(2, "seoseo", "1234");
+        user3 = new UserVo(3, "yunyun", "1234");
     }
 
     @DisplayName("사용자 등록 성공 확인")
     @Test
     void 사용자등록테스트() throws SQLException {
-        userDao.add(user1);
-        UserVo selectUserOne = userDao.userFindById(1);
-        assertEquals("seoyun", selectUserOne.getName());
+        userDao.add(user2);
+        UserVo selectUserOne = userDao.userFindById(2);
+        assertEquals("seoseo", selectUserOne.getName());
     }
 
     @DisplayName("테이블 데이터 전체 삭제")
@@ -61,8 +61,8 @@ class UserDaoTest {
         assertEquals(1, userDao.getCountAll());
         UserVo user = userDao.userFindById(1);
 
-        assertEquals("testName", user.getName());
-        assertEquals("testpw", user.getPassword());
+        assertEquals("seoyun", user.getName());
+        assertEquals("1234", user.getPassword());
     }
 
     @DisplayName("count")
@@ -80,10 +80,13 @@ class UserDaoTest {
     }
 
     @DisplayName("findById")
-    @Test
-    void findById() {
-        assertThrows(EmptyResultDataAccessException.class, ()-> {
-            userDao.userFindById(2);
-        });
+    @Test()
+    void findById() throws SQLException {
+        UserVo user = userDao.userFindById(1);
+        assertEquals("seoyun", user.getName());
+
+        assertThrows(EmptyResultDataAccessException.class,
+                () -> userDao.userFindById(4));
+
     }
 }

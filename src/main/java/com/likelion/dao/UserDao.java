@@ -5,6 +5,7 @@ import com.likelion.domain.Query;
 import com.likelion.domain.UserQueryImpl;
 import com.likelion.vo.UserFactory;
 import com.likelion.vo.UserVo;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,19 +38,26 @@ public class UserDao {
 
     public UserVo userFindById(int id) throws SQLException {
         PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.findOne());
-        ps.setInt(1, id);
-        ResultSet rs = ps.executeQuery();
-
         UserVo user = null;
-        while (rs.next()) {
-            user = UserFactory.createUser(rs.getInt(1)
-                    , rs.getString(2)
-                    , rs.getString(3));
-        }
-        rs.close();
-        ps.close();
-        return user;
+        try {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
 
+            if (rs.next()) {
+                user = UserFactory.createUser(rs.getInt(1)
+                        , rs.getString(2)
+                        , rs.getString(3));
+                System.out.println(user);
+            } else {
+                throw new EmptyResultDataAccessException("해당 유저가 없습니다", 1);
+            }
+
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+        return user;
     }
 
     public void deleteAll() {
@@ -58,8 +66,8 @@ public class UserDao {
             int result = ps.executeUpdate();
             System.out.println(result);
         } catch (SQLException e) {
-            throw new RuntimeException();
-        }finally {
+            e.getMessage();
+        } finally {
             if (ps != null) {
                 try {
                     ps.close();
@@ -67,7 +75,6 @@ public class UserDao {
                 }
             }
         }
-
     }
 
     public void deleteById(int id) {
@@ -75,7 +82,7 @@ public class UserDao {
             PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.deleteOne());
             ps.setInt(1, id);
             int result = ps.executeUpdate();
-            System.out.println(result);// 성공하면 1, 실패하면 0
+            System.out.println(result);
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -83,28 +90,36 @@ public class UserDao {
     }
 
     public int getCountAll() {
+        ResultSet rs = null;
         int count = 0;
+
         try {
             PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.getCountAll());
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if (rs.next()) {
                 count = rs.getInt(1);
             }
-            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
         }
 
         return count;
     }
 
     public static void main(String[] args) throws SQLException {
-        UserDao userDao = new UserDaoFactory().awsUserDao();
-        userDao.add(UserFactory.createUser(4, "sesese", "1234"));
-        //userDao.userFindById(1);
+        UserDao userDao = new UserDaoFactory().localUserDao();
+        //userDao.add(UserFactory.createUser(4, "sesese", "1234"));
+        System.out.println(userDao.userFindById(4));
         //userDao.deleteById(2);
         //userDao.deleteAll();
-        int countAll = userDao.getCountAll();
-        System.out.println(countAll);
+        //int countAll = userDao.getCountAll();
+        //System.out.println(countAll);
     }
 }

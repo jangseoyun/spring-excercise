@@ -7,4 +7,5 @@ public class UserFactory {
         UserVo userVo = new UserVo(getId, getName, getPassword);
         return userVo;
     }
+
 }
