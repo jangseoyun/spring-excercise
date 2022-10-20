@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -37,8 +38,45 @@ class UserDaoTest {
 
     @DisplayName("특정 사용자 삭제")
     @Test
-    void 특정사용자삭제() throws SQLException {
-        UserDao userDao = new UserDaoFactory().awsUserDao();
+    void 테이블전체삭제() throws SQLException {
+        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCountAll());
+    }
+
+    @DisplayName("addAndGet")
+    @Test
+    void addAndGet() throws SQLException {
+        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCountAll());
+
+        int id = 1;
+        userDao.add(new UserVo(id, "testName", "testpw"));
+        assertEquals(1, userDao.getCountAll());
+        UserVo user = userDao.userFindById(id);
+
+        assertEquals("testName", user.getName());
+        assertEquals("testpw", user.getPassword());
+    }
+
+    @DisplayName("count")
+    @Test
+    void count() {
+        UserVo user1 = new UserVo(1, "seoyun", "1234");
+        UserVo user2 = new UserVo(2, "seoseo", "1234");
+        UserVo user3 = new UserVo(3, "yunyun", "1234");
+
+        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCountAll());
+
+        userDao.add(user1);
+        assertEquals(1, userDao.getCountAll());
+        userDao.add(user2);
+        assertEquals(2, userDao.getCountAll());
+        userDao.add(user3);
+        assertEquals(3, userDao.getCountAll());
 
     }
 }
