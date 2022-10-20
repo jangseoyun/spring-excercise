@@ -88,7 +88,7 @@ public class UserDao {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         UserDao userDao = new UserDaoFactory().awsUserDao();
-        //userDao.add(new UserVo(1, "seoyun", "1234"));
+        userDao.add(UserFactory.createUser(1, "seoyun", "1234"));
         //userDao.userFindById(1);
         //userDao.deleteById(2);
         int countAll = userDao.getCountAll();

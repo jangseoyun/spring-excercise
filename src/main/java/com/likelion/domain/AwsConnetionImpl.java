@@ -13,4 +13,9 @@ public class AwsConnetionImpl implements DbConnector{
         Connection conn = DriverManager.getConnection(env.get("DB_HOST"), env.get("DB_USER"), env.get("DB_PASSWORD"));
         return conn;
     }
+
+    public static void main(String[] args) {
+
+    }
+
 }
