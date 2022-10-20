@@ -24,18 +24,23 @@ class UserDaoTest {
     ApplicationContext context;
     UserDao userDao;
 
+    UserVo user1;
+    UserVo user2;
+    UserVo user3;
+
     @BeforeEach
     void setUp() {
          userDao = context.getBean("awsUserDao", UserDao.class);
+         user1 = new UserVo(1, "seoyun", "1234");
+         user2 = new UserVo(2, "seoseo", "1234");
+         user3 = new UserVo(3, "yunyun", "1234");
     }
 
     @DisplayName("사용자 등록 성공 확인")
     @Test
     void 사용자등록테스트() throws SQLException {
         //given
-
-        UserVo user = new UserVo(2, "hellohahaha", "1234");
-        userDao.add(user);
+        userDao.add(user1);
 
         UserVo selectUserOne = userDao.userFindById(2);
 
@@ -53,8 +58,6 @@ class UserDaoTest {
     @DisplayName("addAndGet")
     @Test
     void addAndGet() throws SQLException {
-        UserVo user1 = new UserVo(1, "seoyun", "1234");
-
         UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCountAll());
@@ -70,10 +73,6 @@ class UserDaoTest {
     @DisplayName("count")
     @Test
     void count() {
-        UserVo user1 = new UserVo(1, "seoyun", "1234");
-        UserVo user2 = new UserVo(2, "seoseo", "1234");
-        UserVo user3 = new UserVo(3, "yunyun", "1234");
-
         UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCountAll());
