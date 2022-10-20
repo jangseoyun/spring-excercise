@@ -1,20 +1,20 @@
 package com.likelion.dao;
 
 import com.likelion.vo.UserVo;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = UserDaoFactory.class)
@@ -22,12 +22,18 @@ class UserDaoTest {
 
     @Autowired
     ApplicationContext context;
+    UserDao userDao;
+
+    @BeforeEach
+    void setUp() {
+         userDao = context.getBean("awsUserDao", UserDao.class);
+    }
 
     @DisplayName("사용자 등록 성공 확인")
     @Test
-    void 사용자등록테스트() throws SQLException, ClassNotFoundException {
+    void 사용자등록테스트() throws SQLException {
         //given
-        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+
         UserVo user = new UserVo(2, "hellohahaha", "1234");
         userDao.add(user);
 
@@ -83,6 +89,8 @@ class UserDaoTest {
     @DisplayName("findById")
     @Test
     void findById() {
-
+        assertThrows(EmptyResultDataAccessException.class, ()-> {
+            userDao.userFindById(2);
+        });
     }
 }
