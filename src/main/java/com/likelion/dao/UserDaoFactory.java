@@ -15,4 +15,11 @@ public class UserDaoFactory {
         UserDao userDao = new UserDao(awsConnection);
         return userDao;
     }
+
+    @Bean
+    public UserDao localUserDao() throws SQLException {
+        AwsConnectionImpl awsConnection = new AwsConnectionImpl();
+        UserDao userDao = new UserDao(awsConnection);
+        return userDao;
+    }
 }

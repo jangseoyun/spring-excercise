@@ -30,7 +30,7 @@ class UserDaoTest {
 
     @BeforeEach
     void setUp() {
-         userDao = context.getBean("awsUserDao", UserDao.class);
+         userDao = context.getBean("localUserDao", UserDao.class);
          user1 = new UserVo(1, "seoyun", "1234");
          user2 = new UserVo(2, "seoseo", "1234");
          user3 = new UserVo(3, "yunyun", "1234");
@@ -39,16 +39,14 @@ class UserDaoTest {
     @DisplayName("사용자 등록 성공 확인")
     @Test
     void 사용자등록테스트() throws SQLException {
-        //given
-        userDao.add(user2);
-        UserVo selectUserOne = userDao.userFindById(2);
-        assertEquals("seoseo", selectUserOne.getName());
+        userDao.add(user1);
+        UserVo selectUserOne = userDao.userFindById(1);
+        assertEquals("seoyun", selectUserOne.getName());
     }
 
     @DisplayName("특정 사용자 삭제")
     @Test
     void 테이블전체삭제() throws SQLException {
-        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCountAll());
     }
@@ -56,7 +54,6 @@ class UserDaoTest {
     @DisplayName("addAndGet")
     @Test
     void addAndGet() throws SQLException {
-        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCountAll());
 
@@ -71,7 +68,6 @@ class UserDaoTest {
     @DisplayName("count")
     @Test
     void count() {
-        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCountAll());
 
