@@ -44,7 +44,7 @@ class UserDaoTest {
         assertEquals("seoyun", selectUserOne.getName());
     }
 
-    @DisplayName("특정 사용자 삭제")
+    @DisplayName("테이블 데이터 전체 삭제")
     @Test
     void 테이블전체삭제() throws SQLException {
         userDao.deleteAll();

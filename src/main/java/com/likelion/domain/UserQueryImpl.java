@@ -15,6 +15,7 @@ public class UserQueryImpl implements Query{
     public String add() {
         String query = "";
         query += "insert into users(id, name, password) values (?, ?, ?)";
+        System.out.println(query);
         return query;
     }
 
@@ -23,6 +24,7 @@ public class UserQueryImpl implements Query{
         String query = "";
         query += "select *";
         query += " from users";
+        System.out.println(query);
         return query;
     }
 
@@ -30,6 +32,7 @@ public class UserQueryImpl implements Query{
     public String deleteOne() {
         String query = "";
         query += "delete from users where id = ?";
+        System.out.println(query);
         return query;
     }
 
@@ -37,6 +40,7 @@ public class UserQueryImpl implements Query{
     public String deleteAll() {
         String query = "";
         query += "delete from users";
+        System.out.println(query);
         return query;
     }
 
@@ -44,6 +48,7 @@ public class UserQueryImpl implements Query{
     public String getCountAll() {
         String query = "";
         query += "select count(*) from users";
+        System.out.println(query);
         return query;
     }
 

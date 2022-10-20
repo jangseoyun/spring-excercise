@@ -23,7 +23,7 @@ public class UserDao {
 
     public void add(UserVo user) {
         try {
-            ps = toLocalConn.dbConnection().prepareStatement(query.add());
+            PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.add());
             ps.setInt(1, user.getId());
             ps.setString(2, user.getName());
             ps.setString(3, user.getPassword());
@@ -57,10 +57,17 @@ public class UserDao {
             PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.deleteAll());
             int result = ps.executeUpdate();
             System.out.println(result);
-            ps.close();
         } catch (SQLException e) {
-            throw new RuntimeException("user table 전체 삭제 실패");
+            throw new RuntimeException();
+        }finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
         }
+
     }
 
     public void deleteById(int id) {
@@ -79,9 +86,10 @@ public class UserDao {
         int count = 0;
         try {
             PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.getCountAll());
-
             ResultSet rs = ps.executeQuery();
-            count = rs.getInt(1);
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -90,12 +98,12 @@ public class UserDao {
         return count;
     }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().awsUserDao();
-        //userDao.add(UserFactory.createUser(1, "seoyun", "1234"));
+        userDao.add(UserFactory.createUser(4, "sesese", "1234"));
         //userDao.userFindById(1);
         //userDao.deleteById(2);
-        userDao.deleteAll();
+        //userDao.deleteAll();
         int countAll = userDao.getCountAll();
         System.out.println(countAll);
     }
