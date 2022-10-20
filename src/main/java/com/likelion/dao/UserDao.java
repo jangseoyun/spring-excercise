@@ -3,6 +3,7 @@ package com.likelion.dao;
 import com.likelion.domain.DbConnector;
 import com.likelion.domain.Query;
 import com.likelion.domain.UserQueryImpl;
+import com.likelion.vo.UserFactory;
 import com.likelion.vo.UserVo;
 
 import java.sql.PreparedStatement;
@@ -56,6 +57,7 @@ public class UserDao {
             PreparedStatement ps = toAwsConn.dbConnection().prepareStatement(query.deleteAll());
             int result = ps.executeUpdate();
             System.out.println(result);
+            ps.close();
         } catch (SQLException e) {
             throw new RuntimeException("user table 전체 삭제 실패");
         }
@@ -67,6 +69,7 @@ public class UserDao {
             ps.setInt(1, id);
             int result = ps.executeUpdate();
             System.out.println(result);// 성공하면 1, 실패하면 0
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -79,6 +82,7 @@ public class UserDao {
             ResultSet rs = ps.executeQuery();
             rs.next();
             count = rs.getInt(1);
+            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

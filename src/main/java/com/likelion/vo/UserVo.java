@@ -5,6 +5,8 @@ public class UserVo {
     private String name;
     private String password;
 
+    private static UserVo userVo = new UserVo();
+
     public UserVo() {
     }
 
@@ -24,6 +26,10 @@ public class UserVo {
 
     public String getPassword() {
         return password;
+    }
+
+    public static UserVo getUserVo() {
+        return userVo;
     }
 
     @Override
