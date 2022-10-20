@@ -40,11 +40,9 @@ class UserDaoTest {
     @Test
     void 사용자등록테스트() throws SQLException {
         //given
-        userDao.add(user1);
-
+        userDao.add(user2);
         UserVo selectUserOne = userDao.userFindById(2);
-
-        assertEquals("hellohahaha", selectUserOne.getName());
+        assertEquals("seoseo", selectUserOne.getName());
     }
 
     @DisplayName("특정 사용자 삭제")
