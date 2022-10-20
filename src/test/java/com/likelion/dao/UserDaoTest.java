@@ -47,14 +47,15 @@ class UserDaoTest {
     @DisplayName("addAndGet")
     @Test
     void addAndGet() throws SQLException {
+        UserVo user1 = new UserVo(1, "seoyun", "1234");
+
         UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCountAll());
 
-        int id = 1;
-        userDao.add(new UserVo(id, "testName", "testpw"));
+        userDao.add(user1);
         assertEquals(1, userDao.getCountAll());
-        UserVo user = userDao.userFindById(id);
+        UserVo user = userDao.userFindById(1);
 
         assertEquals("testName", user.getName());
         assertEquals("testpw", user.getPassword());
@@ -77,6 +78,11 @@ class UserDaoTest {
         assertEquals(2, userDao.getCountAll());
         userDao.add(user3);
         assertEquals(3, userDao.getCountAll());
+    }
+
+    @DisplayName("findById")
+    @Test
+    void findById() {
 
     }
 }

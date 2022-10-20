@@ -5,6 +5,7 @@ import com.likelion.domain.Query;
 import com.likelion.domain.UserQueryImpl;
 import com.likelion.vo.UserFactory;
 import com.likelion.vo.UserVo;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,12 +40,18 @@ public class UserDao {
         PreparedStatement ps = toAwsConn.dbConnection().prepareStatement(query.findOne());
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
+
         UserVo user = null;
         while (rs.next()) {
-            int getId = rs.getInt(1);
-            String getName = rs.getString(2);
-            String getPassword = rs.getString(3);
-            user = UserFactory.createUser(getId, getName, getPassword);
+
+            if (rs.next()) {
+                user = UserFactory.createUser(rs.getInt("id")
+                        , rs.getString("name")
+                        , rs.getString("password"));
+            }
+            rs.close();
+
+            if (user == null) throw new EmptyResultDataAccessException(1);
         }
         rs.close();
         ps.close();
@@ -79,8 +86,8 @@ public class UserDao {
         int count = 0;
         try {
             PreparedStatement ps = toAwsConn.dbConnection().prepareStatement(query.getCountAll());
+
             ResultSet rs = ps.executeQuery();
-            rs.next();
             count = rs.getInt(1);
             rs.close();
         } catch (SQLException e) {
@@ -95,6 +102,7 @@ public class UserDao {
         userDao.add(UserFactory.createUser(1, "seoyun", "1234"));
         //userDao.userFindById(1);
         //userDao.deleteById(2);
+        userDao.deleteAll();
         int countAll = userDao.getCountAll();
         System.out.println(countAll);
     }

@@ -1,6 +1,6 @@
 package com.likelion.dao;
 
-import com.likelion.domain.AwsConnetionImpl;
+import com.likelion.domain.AwsConnectionImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,8 +11,8 @@ public class UserDaoFactory {
 
     @Bean
     public UserDao awsUserDao() throws SQLException {
-        AwsConnetionImpl awsConnetion = new AwsConnetionImpl();
-        UserDao userDao = new UserDao(awsConnetion);
+        AwsConnectionImpl awsConnection = new AwsConnectionImpl();
+        UserDao userDao = new UserDao(awsConnection);
         return userDao;
     }
 }
