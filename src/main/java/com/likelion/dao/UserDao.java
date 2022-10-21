@@ -20,12 +20,13 @@ public class UserDao {
     private PreparedStatement ps;
     private ResultSet rs;
 
-    private QueryCrud query;
+    private QueryCrud query; //TODO: strategy로 리팩토링 예정
 
     public UserDao(DbConnector setConnection) throws SQLException {
         this.conn = setConnection.dbConnection();
         this.query = new UserQueryImpl();
         this.ps = null;
+        this.rs = null;
     }
 
     public void add(UserVo user) {

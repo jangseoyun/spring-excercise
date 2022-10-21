@@ -2,7 +2,6 @@ package com.likelion.context;
 
 import com.likelion.domain.UserQueryImpl;
 import com.likelion.vo.UserVo;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
