@@ -1,6 +1,6 @@
 package com.likelion.domain;
 
-public class UserQueryImpl implements Query{
+public class UserQueryImpl implements QueryCrud {
     @Override
     public String findOne() {
         String query = "";

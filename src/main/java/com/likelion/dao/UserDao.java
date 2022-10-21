@@ -1,7 +1,7 @@
 package com.likelion.dao;
 
 import com.likelion.domain.DbConnector;
-import com.likelion.domain.Query;
+import com.likelion.domain.QueryCrud;
 import com.likelion.domain.UserQueryImpl;
 import com.likelion.vo.UserFactory;
 import com.likelion.vo.UserVo;
@@ -17,7 +17,7 @@ public class UserDao {
     private PreparedStatement ps;
     private ResultSet rs;
 
-    private Query query;
+    private QueryCrud query;
 
     public UserDao(DbConnector setConnection) throws SQLException {
         this.conn = setConnection.dbConnection();

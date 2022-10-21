@@ -1,15 +1,18 @@
 package com.likelion.domain;
 
-public interface Query {
+public interface QueryCrud {
     String findOne();
 
-    String add();
-
     String findAll();
+
+    String getCountAll();
+
+    String add();
 
     String deleteOne();
 
     String deleteAll();
 
-    String getCountAll();
+    //update
+
 }
