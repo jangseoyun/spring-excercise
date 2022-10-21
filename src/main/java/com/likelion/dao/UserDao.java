@@ -31,9 +31,6 @@ public class UserDao {
     public void add(UserVo user) {
         try {
             PreparedStatement ps = new AddStrategy().makePreparedStatement(conn);
-            ps.setInt(1, user.getId());
-            ps.setString(2, user.getName());
-            ps.setString(3, user.getPassword());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -64,15 +61,19 @@ public class UserDao {
         return user;
     }
 
-    public void deleteAll() {//DeleteAllStrategy 사용
+    private void jdbcContextWithStatementStrategy(StatementStrategy stmt) {
         try {
-            PreparedStatement ps = new DeleteAllStrategy().makePreparedStatement(conn);
+            PreparedStatement ps = stmt.makePreparedStatement(conn);
             int result = ps.executeUpdate();
             System.out.println(result);
         } catch (SQLException e) {
             e.getMessage();
         }
         close();
+    }
+
+    public void deleteAll() {//DeleteAllStrategy 사용
+        jdbcContextWithStatementStrategy(new DeleteAllStrategy());
     }
 
     public void deleteById(int id) {
@@ -131,9 +132,9 @@ public class UserDao {
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().localUserDao();
         //userDao.add(UserFactory.createUser(4, "sesese", "1234"));
-        System.out.println(userDao.userFindById(1));
+        //System.out.println(userDao.userFindById(1));
         //userDao.deleteById(2);
-        //userDao.deleteAll();
+        userDao.deleteAll();
         //int countAll = userDao.getCountAll();
         //System.out.println(countAll);
     }
