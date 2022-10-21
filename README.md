@@ -5,4 +5,5 @@
 - Spring TDD
 - Factory
 - Singleton pattern
+- Strategy pattern
 - DB Connection
