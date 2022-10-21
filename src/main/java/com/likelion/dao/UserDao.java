@@ -85,7 +85,6 @@ public class UserDao {
     }
 
     public int getCountAll() {
-        ResultSet rs = null;
         int count = 0;
 
         try {
