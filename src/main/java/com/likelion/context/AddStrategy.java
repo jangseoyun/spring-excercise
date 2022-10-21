@@ -10,10 +10,7 @@ import java.sql.SQLException;
 
 public class AddStrategy implements StatementStrategy {
 
-    @Autowired
     private UserQueryImpl userQuery;
-
-    @Autowired
     private UserVo user;
 
     public AddStrategy(UserVo user) {

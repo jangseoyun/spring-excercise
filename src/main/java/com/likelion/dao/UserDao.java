@@ -131,11 +131,11 @@ public class UserDao {
 
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().localUserDao();
-        userDao.add(UserFactory.createUser(2, "sesese", "1234"));
+        //userDao.add(UserFactory.createUser(3, "sesese", "1234"));
         //System.out.println(userDao.userFindById(1));
         //userDao.deleteById(2);
         //userDao.deleteAll();
-        //int countAll = userDao.getCountAll();
-        //System.out.println(countAll);
+        int countAll = userDao.getCountAll();
+        System.out.println(countAll);
     }
 }
