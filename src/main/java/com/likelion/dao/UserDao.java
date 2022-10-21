@@ -62,17 +62,6 @@ public class UserDao {
         return user;
     }
 
-    private void jdbcContextWithStatementStrategy(StatementStrategy stmt) {
-        try {
-            PreparedStatement ps = stmt.makePreparedStatement(conn);
-            int result = ps.executeUpdate();
-            System.out.println(result);
-        } catch (SQLException e) {
-            e.getMessage();
-        }
-        close();
-    }
-
     public void deleteAll() {//DeleteAllStrategy 사용
         jdbcContextWithStatementStrategy(new DeleteAllStrategy());
     }
@@ -104,6 +93,17 @@ public class UserDao {
         close();
 
         return count;
+    }
+
+    private void jdbcContextWithStatementStrategy(StatementStrategy stmt) {
+        try {
+            PreparedStatement ps = stmt.makePreparedStatement(conn);
+            int result = ps.executeUpdate();
+            System.out.println(result);
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+        close();
     }
 
     private void close() {
