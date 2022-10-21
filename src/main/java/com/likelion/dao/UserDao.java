@@ -1,5 +1,8 @@
 package com.likelion.dao;
 
+import com.likelion.context.AddStrategy;
+import com.likelion.context.DeleteAllStrategy;
+import com.likelion.context.StatementStrategy;
 import com.likelion.domain.DbConnector;
 import com.likelion.domain.QueryCrud;
 import com.likelion.domain.UserQueryImpl;
@@ -27,7 +30,7 @@ public class UserDao {
 
     public void add(UserVo user) {
         try {
-            PreparedStatement ps = conn.prepareStatement(query.add());
+            PreparedStatement ps = new AddStrategy().makePreparedStatement(conn);
             ps.setInt(1, user.getId());
             ps.setString(2, user.getName());
             ps.setString(3, user.getPassword());
@@ -61,7 +64,7 @@ public class UserDao {
         return user;
     }
 
-    public void deleteAll() {
+    public void deleteAll() {//DeleteAllStrategy 사용
         try {
             PreparedStatement ps = new DeleteAllStrategy().makePreparedStatement(conn);
             int result = ps.executeUpdate();
