@@ -7,37 +7,39 @@ import com.likelion.vo.UserFactory;
 import com.likelion.vo.UserVo;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-    private DbConnector toLocalConn;
+    private Connection conn;
     private PreparedStatement ps;
+    private ResultSet rs;
+
     private Query query;
 
-    public UserDao(DbConnector setDatabase) throws SQLException {
-        this.toLocalConn = setDatabase;
+    public UserDao(DbConnector setConnection) throws SQLException {
+        this.conn = setConnection.dbConnection();
         this.query = new UserQueryImpl();
         this.ps = null;
     }
 
     public void add(UserVo user) {
         try {
-            PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.add());
+            PreparedStatement ps = conn.prepareStatement(query.add());
             ps.setInt(1, user.getId());
             ps.setString(2, user.getName());
             ps.setString(3, user.getPassword());
             ps.executeUpdate();
-
-            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        close();
     }
 
     public UserVo userFindById(int id) throws SQLException {
-        PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.findOne());
+        PreparedStatement ps = conn.prepareStatement(query.findOne());
         UserVo user = null;
         try {
             ps.setInt(1, id);
@@ -51,35 +53,28 @@ public class UserDao {
             } else {
                 throw new EmptyResultDataAccessException("해당 유저가 없습니다", 1);
             }
-
-            rs.close();
-            ps.close();
         } catch (SQLException e) {
             e.getMessage();
         }
+
+        close();
         return user;
     }
 
     public void deleteAll() {
         try {
-            PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.deleteAll());
+            PreparedStatement ps = new DeleteAllStrategy().makePreparedStatement(conn);
             int result = ps.executeUpdate();
             System.out.println(result);
         } catch (SQLException e) {
             e.getMessage();
-        } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                }
-            }
         }
+        close();
     }
 
     public void deleteById(int id) {
         try {
-            PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.deleteOne());
+            PreparedStatement ps = conn.prepareStatement(query.deleteOne());
             ps.setInt(1, id);
             int result = ps.executeUpdate();
             System.out.println(result);
@@ -94,29 +89,47 @@ public class UserDao {
         int count = 0;
 
         try {
-            PreparedStatement ps = toLocalConn.dbConnection().prepareStatement(query.getCountAll());
+            PreparedStatement ps = conn.prepareStatement(query.getCountAll());
             rs = ps.executeQuery();
             if (rs.next()) {
                 count = rs.getInt(1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                }
+        }
+        close();
+
+        return count;
+    }
+
+    private void close() {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException e) {
             }
         }
 
-        return count;
+        if (ps != null) {
+            try {
+                ps.close();
+            } catch (SQLException e) {
+            }
+        }
+
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+            }
+        }
+
     }
 
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().localUserDao();
         //userDao.add(UserFactory.createUser(4, "sesese", "1234"));
-        System.out.println(userDao.userFindById(4));
+        System.out.println(userDao.userFindById(1));
         //userDao.deleteById(2);
         //userDao.deleteAll();
         //int countAll = userDao.getCountAll();
