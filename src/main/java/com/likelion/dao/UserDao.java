@@ -30,7 +30,7 @@ public class UserDao {
 
     public void add(UserVo user) {
         try {
-            PreparedStatement ps = new AddStrategy().makePreparedStatement(conn);
+            PreparedStatement ps = new AddStrategy(user).makePreparedStatement(conn);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -131,10 +131,10 @@ public class UserDao {
 
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().localUserDao();
-        //userDao.add(UserFactory.createUser(4, "sesese", "1234"));
+        userDao.add(UserFactory.createUser(2, "sesese", "1234"));
         //System.out.println(userDao.userFindById(1));
         //userDao.deleteById(2);
-        userDao.deleteAll();
+        //userDao.deleteAll();
         //int countAll = userDao.getCountAll();
         //System.out.println(countAll);
     }
