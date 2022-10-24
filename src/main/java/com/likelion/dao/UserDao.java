@@ -3,27 +3,29 @@ package com.likelion.dao;
 import com.likelion.context.AddStrategy;
 import com.likelion.context.DeleteAllStrategy;
 import com.likelion.context.StatementStrategy;
-import com.likelion.domain.DbConnector;
 import com.likelion.domain.QueryCrud;
 import com.likelion.domain.UserQueryImpl;
 import com.likelion.vo.UserFactory;
 import com.likelion.vo.UserVo;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
+
+    private DataSource dataSource;
     private Connection conn;
     private PreparedStatement ps;
     private ResultSet rs;
 
-    private QueryCrud query; //TODO: strategy로 리팩토링 예정
+    private QueryCrud query;
 
-    public UserDao(DbConnector setConnection) throws SQLException {
-        this.conn = setConnection.dbConnection();
+    public UserDao(DataSource dataSource) throws SQLException {
+        this.conn = dataSource.getConnection();
         this.query = new UserQueryImpl();
         this.ps = null;
         this.rs = null;
@@ -33,7 +35,6 @@ public class UserDao {
         try {
             PreparedStatement ps = new AddStrategy(user).makePreparedStatement(conn);
             ps.executeUpdate();
-            close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -58,12 +59,16 @@ public class UserDao {
             e.getMessage();
         }
 
-        close();
         return user;
     }
 
     public void deleteAll() {//DeleteAllStrategy 사용
-        jdbcContextWithStatementStrategy(new DeleteAllStrategy());
+        jdbcContextWithStatementStrategy(
+            new DeleteAllStrategy() {
+                public PreparedStatement makePreparedStatement(Connection conn) throws SQLException{
+                    return conn.prepareStatement(query.deleteAll());
+                }
+            });
     }
 
     public void deleteById(int id) {
@@ -90,7 +95,6 @@ public class UserDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        close();
 
         return count;
     }
@@ -103,7 +107,6 @@ public class UserDao {
         } catch (SQLException e) {
             e.getMessage();
         }
-        close();
     }
 
     private void close() {
@@ -132,11 +135,15 @@ public class UserDao {
 
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().localUserDao();
-        //userDao.add(UserFactory.createUser(4, "sesese", "1234"));
+        //userDao.add(UserFactory.createUser(3, "sesese", "1234"));
         //System.out.println(userDao.userFindById(1));
         //userDao.deleteById(2);
         //userDao.deleteAll();
         int countAll = userDao.getCountAll();
         System.out.println(countAll);
+        userDao.close();
     }
+
+
+
 }
