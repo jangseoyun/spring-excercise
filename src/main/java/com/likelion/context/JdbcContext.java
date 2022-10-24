@@ -24,12 +24,4 @@ public class JdbcContext {
         }
     }
 
-    public void getWithStatementStrategy(StatementStrategy stmt) {
-        try {
-            PreparedStatement ps = stmt.makePreparedStatement(dataSource.getConnection());
-            ResultSet rs = ps.executeQuery();
-        } catch (SQLException e) {
-            e.getMessage();
-        }
-    }
 }
