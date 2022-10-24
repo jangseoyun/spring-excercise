@@ -41,7 +41,7 @@ public class UserDao {
     }
 
     public void deleteById(int id) {
-
+        jdbcTemplate.update(query.deleteOne(), id);
     }
 
     public int getCountAll() {
