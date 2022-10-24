@@ -1,100 +1,51 @@
 package com.likelion.dao;
 
-import com.likelion.context.JdbcContext;
-import com.likelion.context.StatementStrategy;
 import com.likelion.domain.QueryCrud;
 import com.likelion.domain.UserQueryImpl;
-import com.likelion.vo.UserFactory;
 import com.likelion.vo.UserVo;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-
-    private final DataSource dataSource;
-    private final JdbcContext jdbcContext;
+    private final JdbcTemplate jdbcTemplate;
     private final QueryCrud query;
 
     public UserDao(DataSource dataSource) {
-        this.dataSource = dataSource;
-        this.jdbcContext = new JdbcContext(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.query = new UserQueryImpl();
     }
 
-    public void add(UserVo user) throws SQLException {
-        jdbcContext.setWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection conn) throws SQLException {
-                PreparedStatement ps = conn.prepareStatement(query.add());
-                ps.setInt(1, user.getId());
-                ps.setString(2, user.getName());
-                ps.setString(3, user.getPassword());
-                return ps;
-            }
-        });
-
+    public void add(UserVo user) {
+        jdbcTemplate.update(query.add(), user.getId(), user.getName(), user.getPassword());
     }
 
     public UserVo userFindById(int id) throws SQLException {
-        PreparedStatement ps = dataSource.getConnection().prepareStatement(query.findOne());
-        UserVo user = null;
-        try {
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                user = UserFactory.createUser(rs.getInt(1)
-                        , rs.getString(2)
-                        , rs.getString(3));
-                System.out.println(user);
-            } else {
-                throw new EmptyResultDataAccessException("해당 유저가 없습니다", 1);
+        RowMapper<UserVo> rowMapper = new RowMapper<>(){
+            @Override
+            public UserVo mapRow(ResultSet rs, int rowNum) throws SQLException {
+                UserVo getUser = new UserVo(rs.getInt("id")
+                        , rs.getString("name")
+                        , rs.getString("password"));
+                return getUser;
             }
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.getMessage();
-        }
-
-        return user;
+        };
+        return jdbcTemplate.queryForObject(query.findOne(), rowMapper, id);
     }
 
     public void deleteAll() throws SQLException {//템플릿 , 콜백 적용
-        jdbcContext.executeSql(query.deleteAll());
+        jdbcTemplate.update(query.deleteAll());
     }
 
     public void deleteById(int id) {
-        try {
-            PreparedStatement ps = dataSource.getConnection().prepareStatement(query.deleteOne());
-            ps.setInt(1, id);
-            int result = ps.executeUpdate();
-            System.out.println(result);
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
     }
 
     public int getCountAll() {
-        int count = 0;
-
-        try {
-            PreparedStatement ps = dataSource.getConnection().prepareStatement(query.getCountAll());
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                count = rs.getInt(1);
-            }
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return count;
+        return jdbcTemplate.queryForObject(query.getCountAll(), Integer.class);
     }
 
     public static void main(String[] args) throws SQLException {
