@@ -13,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,7 +31,6 @@ class UserDaoTest {
 
     @BeforeEach
     void setUp() {
-        userDao = context.getBean("localUserDao", UserDao.class);
         user1 = UserFactory.createUser(1, "seoyun", "1234");
         user2 = UserFactory.createUser(2, "seoseo", "1234");
         user3 = new UserVo(3, "yunyun", "1234");
@@ -38,7 +38,7 @@ class UserDaoTest {
 
     @DisplayName("사용자 등록 성공 확인")
     @Test
-    void 사용자등록테스트() throws SQLException {
+    void 사용자등록테스트() {
         userDao.add(user2);
         UserVo selectUserOne = userDao.userFindById(2);
         assertEquals("seoseo", selectUserOne.getName());
@@ -46,7 +46,7 @@ class UserDaoTest {
 
     @DisplayName("테이블 데이터 전체 삭제")
     @Test
-    void 테이블전체삭제() throws SQLException {
+    void 테이블전체삭제() {
         userDao.deleteAll();
         assertEquals(0, userDao.getCountAll());
     }
@@ -87,6 +87,15 @@ class UserDaoTest {
 
         assertThrows(EmptyResultDataAccessException.class,
                 () -> userDao.userFindById(4));
+
+    }
+
+    @DisplayName("getAll")
+    @Test
+    void getAll() {
+        userDao.deleteAll();
+        List<UserVo> userList = userDao.findAll();
+        assertEquals(0, userList.size());
 
     }
 }

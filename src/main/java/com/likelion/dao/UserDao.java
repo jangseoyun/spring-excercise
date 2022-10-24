@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class UserDao {
     private final JdbcTemplate jdbcTemplate;
@@ -23,7 +24,7 @@ public class UserDao {
         jdbcTemplate.update(query.add(), user.getId(), user.getName(), user.getPassword());
     }
 
-    public UserVo userFindById(int id) throws SQLException {
+    public UserVo userFindById(int id){
         RowMapper<UserVo> rowMapper = new RowMapper<>(){
             @Override
             public UserVo mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -36,12 +37,28 @@ public class UserDao {
         return jdbcTemplate.queryForObject(query.findOne(), rowMapper, id);
     }
 
-    public void deleteAll() throws SQLException {//템플릿 , 콜백 적용
+    public void deleteAll()  {//템플릿 , 콜백 적용
         jdbcTemplate.update(query.deleteAll());
     }
 
     public void deleteById(int id) {
         jdbcTemplate.update(query.deleteOne(), id);
+    }
+
+    public List<UserVo> findAll() {
+        RowMapper<UserVo> rowMapper = new RowMapper<>(){
+            @Override
+            public UserVo mapRow(ResultSet rs, int rowNum) throws SQLException {
+                UserVo user = new UserVo(
+                        rs.getInt("id")
+                        , rs.getString("name")
+                        , rs.getString("password")
+                );
+                return user;
+            }
+        };
+
+        return jdbcTemplate.query(query.findAll(), rowMapper);
     }
 
     public int getCountAll() {
@@ -54,8 +71,9 @@ public class UserDao {
         //System.out.println(userDao.userFindById(1));
         //userDao.deleteById(2);
         //userDao.deleteAll();
-        int countAll = userDao.getCountAll();
-        System.out.println(countAll);
+        //int countAll = userDao.getCountAll();
+        //System.out.println(countAll);
+        System.out.println(userDao.findAll());
     }
 
 
