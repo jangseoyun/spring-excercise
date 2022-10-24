@@ -18,35 +18,30 @@ import java.sql.SQLException;
 public class UserDao {
 
     private DataSource dataSource;
-    private Connection conn;
-    private PreparedStatement ps;
-    private ResultSet rs;
 
     private QueryCrud query;
 
-    public UserDao(DataSource dataSource) throws SQLException {
-        this.conn = dataSource.getConnection();
+    public UserDao(DataSource dataSource) {
+        this.dataSource = dataSource;
         this.query = new UserQueryImpl();
-        this.ps = null;
-        this.rs = null;
     }
 
     public void add(UserVo user) {
         try {
-            PreparedStatement ps = new AddStrategy(user).makePreparedStatement(conn);
+            PreparedStatement ps = new AddStrategy(user).makePreparedStatement(dataSource.getConnection());
             ps.executeUpdate();
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public UserVo userFindById(int id) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement(query.findOne());
+        PreparedStatement ps = dataSource.getConnection().prepareStatement(query.findOne());
         UserVo user = null;
         try {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
                 user = UserFactory.createUser(rs.getInt(1)
                         , rs.getString(2)
@@ -55,6 +50,8 @@ public class UserDao {
             } else {
                 throw new EmptyResultDataAccessException("해당 유저가 없습니다", 1);
             }
+            rs.close();
+            ps.close();
         } catch (SQLException e) {
             e.getMessage();
         }
@@ -73,7 +70,7 @@ public class UserDao {
 
     public void deleteById(int id) {
         try {
-            PreparedStatement ps = conn.prepareStatement(query.deleteOne());
+            PreparedStatement ps = dataSource.getConnection().prepareStatement(query.deleteOne());
             ps.setInt(1, id);
             int result = ps.executeUpdate();
             System.out.println(result);
@@ -87,11 +84,13 @@ public class UserDao {
         int count = 0;
 
         try {
-            PreparedStatement ps = conn.prepareStatement(query.getCountAll());
-            rs = ps.executeQuery();
+            PreparedStatement ps = dataSource.getConnection().prepareStatement(query.getCountAll());
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 count = rs.getInt(1);
             }
+            rs.close();
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -101,15 +100,16 @@ public class UserDao {
 
     private void jdbcContextWithStatementStrategy(StatementStrategy stmt) {
         try {
-            PreparedStatement ps = stmt.makePreparedStatement(conn);
+            PreparedStatement ps = stmt.makePreparedStatement(dataSource.getConnection());
             int result = ps.executeUpdate();
             System.out.println(result);
+            ps.close();
         } catch (SQLException e) {
             e.getMessage();
         }
     }
 
-    private void close() {
+    /*private void close() {
         if (rs != null) {
             try {
                 rs.close();
@@ -131,7 +131,7 @@ public class UserDao {
             }
         }
 
-    }
+    }*/
 
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().localUserDao();
@@ -141,7 +141,6 @@ public class UserDao {
         //userDao.deleteAll();
         int countAll = userDao.getCountAll();
         System.out.println(countAll);
-        userDao.close();
     }
 
 
