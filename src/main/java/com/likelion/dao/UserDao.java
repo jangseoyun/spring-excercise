@@ -1,7 +1,6 @@
 package com.likelion.dao;
 
-import com.likelion.context.AddStrategy;
-import com.likelion.context.DeleteAllStrategy;
+import com.likelion.context.JdbcContext;
 import com.likelion.context.StatementStrategy;
 import com.likelion.domain.QueryCrud;
 import com.likelion.domain.UserQueryImpl;
@@ -17,23 +16,28 @@ import java.sql.SQLException;
 
 public class UserDao {
 
-    private DataSource dataSource;
-
-    private QueryCrud query;
+    private final DataSource dataSource;
+    private final JdbcContext jdbcContext;
+    private final QueryCrud query;
 
     public UserDao(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.jdbcContext = new JdbcContext(dataSource);
         this.query = new UserQueryImpl();
     }
 
     public void add(UserVo user) {
-        try {
-            PreparedStatement ps = new AddStrategy(user).makePreparedStatement(dataSource.getConnection());
-            ps.executeUpdate();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        jdbcContext.setWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection conn) throws SQLException {
+                PreparedStatement ps = conn.prepareStatement(query.add());
+                ps.setInt(1, user.getId());
+                ps.setString(2, user.getName());
+                ps.setString(3, user.getPassword());
+                return ps;
+            }
+        });
+
     }
 
     public UserVo userFindById(int id) throws SQLException {
@@ -60,12 +64,12 @@ public class UserDao {
     }
 
     public void deleteAll() {//DeleteAllStrategy 사용
-        jdbcContextWithStatementStrategy(
-            new DeleteAllStrategy() {
-                public PreparedStatement makePreparedStatement(Connection conn) throws SQLException{
-                    return conn.prepareStatement(query.deleteAll());
-                }
-            });
+        jdbcContext.setWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
+                return dataSource.getConnection().prepareStatement(query.deleteAll());
+            }
+        });
     }
 
     public void deleteById(int id) {
@@ -98,41 +102,6 @@ public class UserDao {
         return count;
     }
 
-    private void jdbcContextWithStatementStrategy(StatementStrategy stmt) {
-        try {
-            PreparedStatement ps = stmt.makePreparedStatement(dataSource.getConnection());
-            int result = ps.executeUpdate();
-            System.out.println(result);
-            ps.close();
-        } catch (SQLException e) {
-            e.getMessage();
-        }
-    }
-
-    /*private void close() {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-            }
-        }
-
-        if (ps != null) {
-            try {
-                ps.close();
-            } catch (SQLException e) {
-            }
-        }
-
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-            }
-        }
-
-    }*/
-
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().localUserDao();
         //userDao.add(UserFactory.createUser(3, "sesese", "1234"));
@@ -142,7 +111,6 @@ public class UserDao {
         int countAll = userDao.getCountAll();
         System.out.println(countAll);
     }
-
 
 
 }

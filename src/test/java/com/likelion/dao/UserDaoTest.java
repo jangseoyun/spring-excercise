@@ -83,7 +83,7 @@ class UserDaoTest {
     @Test()
     void findById() throws SQLException {
         UserVo user = userDao.userFindById(1);
-        assertEquals("seoyun", user.getName());
+        assertEquals("sesese", user.getName());
 
         assertThrows(EmptyResultDataAccessException.class,
                 () -> userDao.userFindById(4));
