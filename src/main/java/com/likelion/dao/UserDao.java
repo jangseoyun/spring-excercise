@@ -33,10 +33,10 @@ public class UserDao {
         try {
             PreparedStatement ps = new AddStrategy(user).makePreparedStatement(conn);
             ps.executeUpdate();
+            close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        close();
     }
 
     public UserVo userFindById(int id) throws SQLException {
@@ -132,7 +132,7 @@ public class UserDao {
 
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDaoFactory().localUserDao();
-        //userDao.add(UserFactory.createUser(3, "sesese", "1234"));
+        //userDao.add(UserFactory.createUser(4, "sesese", "1234"));
         //System.out.println(userDao.userFindById(1));
         //userDao.deleteById(2);
         //userDao.deleteAll();
