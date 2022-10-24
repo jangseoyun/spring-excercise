@@ -1,8 +1,8 @@
 package com.likelion.context;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class JdbcContext {
@@ -13,14 +13,23 @@ public class JdbcContext {
         this.dataSource = dataSource;
     }
 
-    public void setWithStatementStrategy(StatementStrategy stmt) {
+    public void setWithStatementStrategy(StatementStrategy stmt) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = stmt.makePreparedStatement(dataSource.getConnection());
+            conn = dataSource.getConnection();
+            ps = stmt.makePreparedStatement(dataSource.getConnection());
             int result = ps.executeUpdate();
             System.out.println(result);
-            ps.close();
         } catch (SQLException e) {
             e.getMessage();
+        }finally {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 

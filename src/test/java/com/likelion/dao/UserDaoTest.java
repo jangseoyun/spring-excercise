@@ -67,7 +67,7 @@ class UserDaoTest {
 
     @DisplayName("count")
     @Test
-    void count() {
+    void count() throws SQLException {
         userDao.deleteAll();
         assertEquals(0, userDao.getCountAll());
 

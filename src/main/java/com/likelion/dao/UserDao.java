@@ -26,7 +26,7 @@ public class UserDao {
         this.query = new UserQueryImpl();
     }
 
-    public void add(UserVo user) {
+    public void add(UserVo user) throws SQLException {
         jdbcContext.setWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection conn) throws SQLException {
@@ -63,7 +63,7 @@ public class UserDao {
         return user;
     }
 
-    public void deleteAll() {//DeleteAllStrategy 사용
+    public void deleteAll() throws SQLException {
         jdbcContext.setWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
