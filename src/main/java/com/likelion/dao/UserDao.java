@@ -63,13 +63,8 @@ public class UserDao {
         return user;
     }
 
-    public void deleteAll() throws SQLException {
-        jdbcContext.setWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
-                return dataSource.getConnection().prepareStatement(query.deleteAll());
-            }
-        });
+    public void deleteAll() throws SQLException {//템플릿 , 콜백 적용
+        jdbcContext.executeSql(query.deleteAll());
     }
 
     public void deleteById(int id) {
