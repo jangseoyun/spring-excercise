@@ -12,7 +12,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class UserDaoTest {
 
     @Autowired
-    ApplicationContext context;
+    ApplicationContext ac;
+
     UserDao userDao;
     UserVo user1;
     UserVo user2;
@@ -31,17 +31,19 @@ class UserDaoTest {
 
     @BeforeEach
     void setUp() {
+        userDao = ac.getBean("localUserDao", UserDao.class);
         user1 = UserFactory.createUser(1, "seoyun", "1234");
         user2 = UserFactory.createUser(2, "seoseo", "1234");
-        user3 = new UserVo(3, "yunyun", "1234");
+        user3 = UserFactory.createUser(3, "yunyun", "1234");
+        userDao.deleteAll();
     }
 
     @DisplayName("사용자 등록 성공 확인")
     @Test
     void 사용자등록테스트() {
-        userDao.add(user2);
-        UserVo selectUserOne = userDao.userFindById(2);
-        assertEquals("seoseo", selectUserOne.getName());
+        userDao.add(user1);
+        UserVo selectUserOne = userDao.userFindById(1);
+        assertEquals("seoyun", selectUserOne.getName());
     }
 
     @DisplayName("테이블 데이터 전체 삭제")
@@ -51,10 +53,9 @@ class UserDaoTest {
         assertEquals(0, userDao.getCountAll());
     }
 
-    @DisplayName("addAndGet")
+    @DisplayName("사용자 등록 후 가져오기")
     @Test
-    void addAndGet() throws SQLException {
-        userDao.deleteAll();
+    void addAndGet() {
         assertEquals(0, userDao.getCountAll());
 
         userDao.add(user1);
@@ -65,10 +66,9 @@ class UserDaoTest {
         assertEquals("1234", user.getPassword());
     }
 
-    @DisplayName("count")
+    @DisplayName("user 테이블 전체 카운트")
     @Test
-    void count() throws SQLException {
-        userDao.deleteAll();
+    void count() {
         assertEquals(0, userDao.getCountAll());
 
         userDao.add(user1);
@@ -79,9 +79,10 @@ class UserDaoTest {
         assertEquals(3, userDao.getCountAll());
     }
 
-    @DisplayName("findById")
+    @DisplayName("해당 유저 한명 데이터 반환")
     @Test()
-    void findById() throws SQLException {
+    void findById() {
+        userDao.add(user1);
         UserVo user = userDao.userFindById(1);
         assertEquals("seoyun", user.getName());
 
@@ -90,12 +91,14 @@ class UserDaoTest {
 
     }
 
-    @DisplayName("getAll")
+    @DisplayName("전체 유저 데이터 반환")
     @Test
     void getAll() {
-        userDao.deleteAll();
         List<UserVo> userList = userDao.findAll();
         assertEquals(0, userList.size());
-
+        userDao.add(user1);
+        userDao.add(user2);
+        userDao.add(user3);
+        assertEquals(3, userDao.findAll().size());
     }
 }

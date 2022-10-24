@@ -5,19 +5,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.Map;
 
 @Configuration
 public class UserDaoFactory {
 
     @Bean
-    public UserDao awsUserDao() throws SQLException {
+    public UserDao awsUserDao() {
         return new UserDao(awsDataSource());
     }
 
     @Bean
-    public UserDao localUserDao() throws SQLException {
+    public UserDao localUserDao() {
         return new UserDao(localDataSource());
     }
 

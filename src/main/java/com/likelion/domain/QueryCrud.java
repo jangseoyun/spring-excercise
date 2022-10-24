@@ -13,6 +13,4 @@ public interface QueryCrud {
 
     String deleteAll();
 
-    //update
-
 }
